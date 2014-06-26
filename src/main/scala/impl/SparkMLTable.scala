@@ -6,6 +6,7 @@ import mli.interface.MLTypes._
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.mllib.regression.LabeledPoint
 
 
@@ -57,20 +58,21 @@ class SparkMLTable(@transient protected var rdd: RDD[MLRow], inSchema: Option[Sc
    */
   def join(other: MLTable, cols: Seq[Index]): SparkMLTable = this
 
-  def join(other: SparkMLTable, cols: Seq[Index]) = {
-
-    //Parse out the key columns from each table.
-    val t1 = rdd.map(row => (cols.map(row(_)), nonCols(cols, schema).map(row(_))))
-    val t2 = other.rdd.map(row => (cols.map(row(_)), nonCols(cols, other.schema).map(row(_))))
-
-    //Join the table, combine the rows, and create a new schema.
-    //val newRdd = t1.join(t2).map(k => MLRow(k._1 ++ k._2._1 ++ k._2._2))
-    val newRdd = t1.join(t2).map { case (a,(b,c)) => MLRow.chooseRepresentation(a ++ b ++ c)}
-    lazy val newSchema = schema.join(other.schema, cols)
-
-    new SparkMLTable(newRdd, Some(newSchema))
-
-  }
+//  // TODO: COMMENTED THIS METHOD - due to compilation error on t1.join(t2)
+//  def join(other: SparkMLTable, cols: Seq[Index]) = {
+//
+//    //Parse out the key columns from each table.
+//    val t1 = rdd.map(row => (cols.map(row(_)), nonCols(cols, schema).map(row(_))))
+//    val t2 = other.rdd.map(row => (cols.map(row(_)), nonCols(cols, other.schema).map(row(_))))
+//
+//    //Join the table, combine the rows, and create a new schema.
+//    //val newRdd = t1.join(t2).map(k => MLRow(k._1 ++ k._2._1 ++ k._2._2))
+//    val newRdd = t1.join(t2).map { case (a,(b,c)) => MLRow.chooseRepresentation(a ++ b ++ c)}
+//    lazy val newSchema = schema.join(other.schema, cols)
+//
+//    new SparkMLTable(newRdd, Some(newSchema))
+//
+//  }
 
 
   /**
@@ -141,7 +143,7 @@ class SparkMLTable(@transient protected var rdd: RDD[MLRow], inSchema: Option[Sc
 //    }
     def cachedMatrixMap(m: LocalMatrix): Iterator[MLRow] = f(m).toMLRows
 
-    def createMatrix(i: Iterator[MLRow]): Iterator[LocalMatrix] = Iterator(DenseMLMatrix.fromVecs(i.map(_.toVector).toSeq))
+    def createMatrix(i: Iterator[MLRow]): Iterator[LocalMatrix] = Iterator(DenseMLMatrix.fromVecs(i.map(_.toMLVector).toSeq))
 
 
     cachedMat match {
@@ -188,10 +190,12 @@ class SparkMLTable(@transient protected var rdd: RDD[MLRow], inSchema: Option[Sc
    */
   def toRDD(targetCol: Index = 0): RDD[LabeledPoint] = {
     val othercols = nonCols(Seq(targetCol), schema)
-    rdd.map(r => LabeledPoint(r(targetCol).toNumber, r(othercols).toDoubleArray))
+    rdd.map(r => LabeledPoint(r(targetCol).toNumber, Vectors.dense(r(othercols).toDoubleArray)))
   }
 
   def toDoubleArrayRDD: RDD[Array[Double]] = rdd.map(r => r.toDoubleArray)
+
+  def toVectorRDD: RDD[Vector] = rdd.map(r => Vectors.dense(r.toDoubleArray))
 
   def toMLRowRdd(): RDD[MLRow] = rdd
 

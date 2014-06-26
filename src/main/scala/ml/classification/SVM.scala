@@ -3,6 +3,7 @@ package mli.ml.classification
 import mli.interface._
 import mli.ml._
 import org.apache.spark.mllib.classification.SVMWithSGD
+import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
 
 class SVMModel(
@@ -15,7 +16,7 @@ class SVMModel(
 
   /* Predicts the label of a given data point. */
   def predict(x: MLRow) : MLValue = {
-    MLValue(model.predict(x.toDoubleArray))
+    MLValue(model.predict(Vectors.dense(x.toDoubleArray)))
   }
 
   /**
@@ -23,14 +24,14 @@ class SVMModel(
    * For example, plots or console output.
    */
   def explain() : String = {
-    "Weights: " + model.weights.mkString(" ")
+    "Weights: " + model.weights.toArray.mkString(" ")
   }
 
   lazy val features: Seq[(String, Double)] = trainingTbl.schema
       .columns.drop(1)
       .zipWithIndex
       .map(c => c._1.name.getOrElse(c._2.toString))
-      .zip(model.weights)
+      .zip(model.weights.toArray)
 }
 
 case class SVMParameters(

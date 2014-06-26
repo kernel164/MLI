@@ -6,6 +6,7 @@ import mli.interface.MLTypes._
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import SparkContext._
+import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.regression.LabeledPoint
 
 
@@ -128,6 +129,7 @@ trait MLTable {
   //We support toRDD to for interoperability with Spark.
   def toRDD(targetCol: Index = 0): RDD[LabeledPoint]
   def toDoubleArrayRDD(): RDD[Array[Double]]
+  def toVectorRDD: RDD[Vector]
 
   //Concrete methods provided by the interface below.
   def project(cols: => Seq[String]): MLTable = {

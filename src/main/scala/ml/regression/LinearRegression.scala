@@ -2,6 +2,7 @@ package mli.ml.classification
 
 import mli.interface._
 import mli.ml._
+import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.{LassoWithSGD,RegressionModel}
 
 class LinearRegressionModel(
@@ -14,7 +15,7 @@ class LinearRegressionModel(
 
   /* Predicts the label of a given data point. */
   def predict(x: MLRow) : MLValue = {
-    MLValue(model.predict(x.toDoubleArray))
+    MLValue(model.predict(Vectors.dense(x.toDoubleArray)))
   }
 
   /**

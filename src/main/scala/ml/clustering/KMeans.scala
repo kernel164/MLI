@@ -3,6 +3,7 @@ package mli.ml.clustering
 import mli.interface._
 import mli.ml._
 import org.apache.spark.mllib.clustering.KMeans
+import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
 
 class KMeansModel(
@@ -15,7 +16,7 @@ class KMeansModel(
 
   /* Predicts the label of a given data point. */
   def predict(x: MLRow) : MLValue = {
-    MLValue(model.predict(x.toDoubleArray))
+    MLValue(model.predict(Vectors.dense(x.toDoubleArray)))
   }
 
   /**
@@ -50,7 +51,7 @@ object KMeansAlgorithm extends Algorithm[KMeansParameters] {
 
     //Run the K-Means algorithm on the data.
     val model = KMeans.train(
-      data.toDoubleArrayRDD().cache(),
+      data.toVectorRDD.cache(),
       params.k,
       params.maxIterations,
       params.runs,

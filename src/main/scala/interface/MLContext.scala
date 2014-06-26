@@ -1,6 +1,7 @@
 package mli.interface
 
 import org.apache.spark
+import scala.reflect.{ClassTag, classTag}
 import mli.interface.impl.SparkMLTable
 import org.apache.spark.broadcast.Broadcast
 
@@ -18,7 +19,7 @@ class MLContext(@transient val sc: spark.SparkContext) extends Serializable {
    * @return Broadcast a read-only variable to the cluster, returning a Broadcast object for reading it
    *         in distributed functions. The variable will be sent to each cluster only once.
    */
-  def broadcast[T](value: T): Broadcast[T] = sc.broadcast(value)
+  def broadcast[T: ClassTag](value: T): Broadcast[T] = sc.broadcast(value)
 
   /**
    *

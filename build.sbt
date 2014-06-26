@@ -4,17 +4,17 @@ assemblySettings
 
 name := "MLI"
 
-version := "0.8.1-incubating"
+version := "1.0.0"
 
 organization := "edu.berkeley.cs.amplab"
 
-scalaVersion := "2.9.3"
+scalaVersion := "2.10.4"
 
 classpathTypes ~= (_ + "orbit")
 
 libraryDependencies ++= Seq(
-  "org.apache.spark" % "spark-core_2.9.3" % "0.8.1-incubating",
-  "org.apache.spark" % "spark-mllib_2.9.3" % "0.8.1-incubating",
+  "org.apache.spark" % "spark-core_2.10" % "1.0.0",
+  "org.apache.spark" % "spark-mllib_2.10" % "1.0.0",
   "org.scalatest" %% "scalatest" % "1.9.1" % "test"
 )
 

@@ -5,7 +5,7 @@ import mli.impl.DenseMLMatrix
 
 
 trait MLVectorable {
-  def toVector: MLVector
+  def toMLVector: MLVector
 }
 
 /**

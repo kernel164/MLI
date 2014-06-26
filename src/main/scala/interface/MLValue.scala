@@ -54,9 +54,9 @@ object MLValue {
     if(exp.isEmpty) MLDouble(None)
     else {
       try{ MLInt(Some(exp.toInt)) } catch {
-        case _ => try {
+        case _:Throwable => try {
           MLDouble(Some(exp.toDouble)) } catch {
-          case _ => MLString(Some(exp))
+          case _:Throwable => MLString(Some(exp))
         }
       }
     }

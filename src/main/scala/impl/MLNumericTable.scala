@@ -6,6 +6,7 @@ import mli.interface.MLTypes._
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
+import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.LabeledPoint
 
 
@@ -173,7 +174,7 @@ class MLNumericTable(@transient protected var rdd: RDD[MLVector], inSchema: Opti
    */
   def toRDD(targetCol: Index = 0): RDD[LabeledPoint] = {
     val othercols = nonCols(Seq(targetCol), schema)
-    rdd.map(r => LabeledPoint(r(targetCol), r(othercols).toDoubleArray))
+    rdd.map(r => LabeledPoint(r(targetCol), Vectors.dense(r(othercols).toDoubleArray)))
   }
 
   def toDoubleArrayRDD: RDD[Array[Double]] = rdd.map(r => r.toDoubleArray)
